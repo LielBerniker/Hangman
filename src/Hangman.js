@@ -12,6 +12,7 @@ class Hangman extends Component {
   /** by default, allow 6 guesses and use provided gallows images. */
   static defaultProps = {
     maxWrong: 6,
+    gameOver:false,
     images: [img0, img1, img2, img3, img4, img5, img6]
   };
 
@@ -39,13 +40,15 @@ class Hangman extends Component {
     this.setState(st => ({
       guessed: st.guessed.add(ltr),
       nWrong: st.nWrong + (st.answer.includes(ltr) ? 0 : 1)
-    }));
+    }))
+    ;
   }
 
   /** generateButtons: return array of letter buttons to render */
   generateButtons() {
     return "abcdefghijklmnopqrstuvwxyz".split("").map(ltr => (
       <button
+        key={ltr}
         value={ltr}
         onClick={this.handleGuess}
         disabled={this.state.guessed.has(ltr)}
@@ -57,12 +60,18 @@ class Hangman extends Component {
 
   /** render: render game */
   render() {
+    const gameOver = this.state.nWrong>=this.props.maxWrong 
+    const altText = `${this.state.nWrong}/${this.props.maxWrong}` 
     return (
       <div className='Hangman'>
         <h1>Hangman</h1>
-        <img src={this.props.images[this.state.nWrong]} />
-        <p className='Hangman-word'>{this.guessedWord()}</p>
-        <p className='Hangman-btns'>{this.generateButtons()}</p>
+        <img src={this.props.images[this.state.nWrong]} alt={altText}/>
+        <p>Guessed Wrong: {this.state.nWrong} </p>
+        <p className='Hangman-word'>{!gameOver? this.guessedWord() : this.state.answer}</p>
+        <p className='Hangman-btns'>
+          {!gameOver ?this.generateButtons()
+          :"You lose"}
+          </p>
       </div>
     );
   }
